@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nu11.backend.dao.ApiDao">
+    <update id="increaseCount">
+        update t_api set count = count + 1 where url = #{url}
+    </update>
+    <select id="analyse" resultType="com.nu11.backend.vo.ApiAnalyseVO">
+        select name,count as value from t_api
+    </select>
+</mapper>

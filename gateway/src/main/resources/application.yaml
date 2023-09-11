@@ -1,0 +1,65 @@
+server:
+  port: 10000
+spring:
+  application:
+    name: gateway-10000
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        - id: backend-router-1
+          uri: lb://backend-10001
+          predicates:
+            - Path=/api/backend/user/**
+          filters:
+            - Info=access_token
+            - RewritePath=/api/?(?<segment>.*), /$\{segment}
+
+        - id: backend-router-2
+          uri: lb://backend-10001
+          predicates:
+            - Path=/api/backend/auth/**, /api/backend/oauth2/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*), /$\{segment}
+
+        - id: backend-router-3
+          uri: lb://backend-10001
+          predicates:
+            - Path=/api/backend/api/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*), /$\{segment}
+
+        - id: backend-router-4
+          uri: lb://backend-10001
+          predicates:
+            - Path=/api/backend/params/**
+          filters:
+            - Info=access_token
+            - RewritePath=/api/?(?<segment>.*), /$\{segment}
+        - id: third-party-router
+          uri: lb://third-party-10002
+          predicates:
+            - Path=/api/third/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*), /$\{segment}
+        - id: api-router-1
+          uri: lb://api-10003
+          predicates:
+            - Path=/api/interface/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*), /$\{segment}
+            - InvokeApi=access_key, timestamp, signature
+        - id: api-router-2
+          uri: lb://api-10003
+          predicates:
+            - Path=/api/debug/interface/**
+          filters:
+            - RewritePath=/api/debug/?(?<segment>.*), /$\{segment}
+            - Debug=access_key
+
+  rabbitmq:
+    host: 47.113.145.162
+
+
